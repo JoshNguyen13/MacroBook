@@ -1,0 +1,88 @@
+import { useCallback, useState } from 'react';
+import { View, Text, Image, FlatList, Pressable, StyleSheet } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../lib/AuthContext';
+import type { RecipesStackParamList } from '../../navigation/RecipesStack';
+import type { SavedRecipe } from '../../types/database';
+
+type Props = NativeStackScreenProps<RecipesStackParamList, 'SavedRecipes'>;
+
+export default function SavedRecipesScreen({ navigation }: Props) {
+  const { session } = useAuth();
+  const [recipes, setRecipes] = useState<SavedRecipe[]>([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!session) return;
+      supabase
+        .from('saved_recipes')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false })
+        .then(({ data }) => {
+          if (data) setRecipes(data);
+        });
+    }, [session])
+  );
+
+  const openRecipe = (recipe: SavedRecipe) => {
+    navigation.navigate('RecipeDetail', {
+      mode: 'saved',
+      title: recipe.title,
+      image: recipe.image_url,
+      ingredients: (recipe.ingredients as string[]) ?? [],
+      steps: (recipe.steps as string[]) ?? [],
+      sourceType: recipe.source_type,
+      sourceUrl: recipe.source_url,
+    });
+  };
+
+  if (recipes.length === 0) {
+    return (
+      <View style={styles.empty}>
+        <Text style={styles.emptyText}>No saved recipes yet.</Text>
+      </View>
+    );
+  }
+
+  return (
+    <FlatList
+      style={styles.container}
+      data={recipes}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <Pressable style={styles.row} onPress={() => openRecipe(item)}>
+          {item.image_url ? (
+            <Image source={{ uri: item.image_url }} style={styles.rowImage} />
+          ) : (
+            <View style={styles.rowImagePlaceholder} />
+          )}
+          <View style={styles.rowText}>
+            <Text style={styles.rowTitle}>{item.title}</Text>
+            <Text style={styles.rowSource}>{item.source_type}</Text>
+          </View>
+        </Pressable>
+      )}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#fff', padding: 16 },
+  empty: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
+  emptyText: { color: '#999' },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  rowImage: { width: 56, height: 56, borderRadius: 8, backgroundColor: '#eee', marginRight: 12 },
+  rowImagePlaceholder: { width: 56, height: 56, borderRadius: 8, backgroundColor: '#f0f0f0', marginRight: 12 },
+  rowText: { flex: 1 },
+  rowTitle: { fontSize: 15, fontWeight: '500' },
+  rowSource: { fontSize: 12, color: '#999', marginTop: 2, textTransform: 'capitalize' },
+});

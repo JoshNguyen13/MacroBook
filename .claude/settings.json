@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__claude_ai_Notion__notion-fetch",
+      "Bash(npx --yes create-expo-app@latest __scaffold_tmp --template blank-typescript)",
+      "Bash(rm -rf __scaffold_tmp/.claude)",
+      "Bash(mv __scaffold_tmp/* __scaffold_tmp/.gitignore .)",
+      "Bash(npx expo *)",
+      "Bash(npx tsc *)",
+      "Bash(xargs grep -l \"GenericSchema\")",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/@supabase/supabase-js/package.json'\\).version\\)\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8081)",
+      "Bash(npm install *)",
+      "Bash(grep -o 'src=\"[^\"]*\\\\.js[^\"]*\"' /tmp/resp.html | head -5)",
+      "Read(//tmp/**)",
+      "Bash(taskkill //F //IM node.exe //T)",
+      "Bash(supabase --version)",
+      "Bash(npx supabase *)",
+      "Bash(node -e ' *)",
+      "WebSearch"
+    ]
+  }
+}
