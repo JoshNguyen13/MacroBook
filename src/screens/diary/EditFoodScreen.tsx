@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { supabase } from '../../lib/supabase';
+import { confirmAsync } from '../../lib/confirm';
 import type { DiaryStackParamList } from '../../navigation/DiaryStack';
 import type { MealType } from '../../types/database';
 
@@ -59,11 +60,9 @@ export default function EditFoodScreen({ route, navigation }: Props) {
     navigation.goBack();
   };
 
-  const handleDelete = () => {
-    Alert.alert('Delete entry?', `Remove "${log.food_name}" from your diary.`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: performDelete },
-    ]);
+  const handleDelete = async () => {
+    const confirmed = await confirmAsync('Delete entry?', `Remove "${log.food_name}" from your diary.`);
+    if (confirmed) await performDelete();
   };
 
   return (

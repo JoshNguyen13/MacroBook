@@ -3,18 +3,26 @@ import RecipesScreen from '../screens/recipes/RecipesScreen';
 import RecipeDetailScreen from '../screens/recipes/RecipeDetailScreen';
 import SavedRecipesScreen from '../screens/recipes/SavedRecipesScreen';
 import ImportRecipeScreen from '../screens/recipes/ImportRecipeScreen';
-import ImportReviewScreen from '../screens/recipes/ImportReviewScreen';
+import EditRecipeScreen from '../screens/recipes/EditRecipeScreen';
+import WhatCanIMakeScreen from '../screens/recipes/WhatCanIMakeScreen';
 import type { RecipeSourceType } from '../types/database';
 
 export type RecipeDetailParams =
   | {
       mode: 'saved';
+      id: string;
       title: string;
       image: string | null;
       ingredients: string[];
       steps: string[];
       sourceType: RecipeSourceType;
       sourceUrl: string | null;
+      rawCaption: string | null;
+      servings: number | null;
+      caloriesPerServing: number | null;
+      proteinPerServingG: number | null;
+      carbsPerServingG: number | null;
+      fatPerServingG: number | null;
     }
   | {
       mode: 'spoonacular';
@@ -23,22 +31,13 @@ export type RecipeDetailParams =
       image: string | null;
     };
 
-export type ImportReviewParams = {
-  platform: RecipeSourceType;
-  title: string;
-  image: string | null;
-  caption: string;
-  ingredients: string[];
-  steps: string[];
-  sourceUrl: string;
-};
-
 export type RecipesStackParamList = {
   RecipesSearch: undefined;
   SavedRecipes: undefined;
   RecipeDetail: RecipeDetailParams;
   ImportRecipe: undefined;
-  ImportReview: ImportReviewParams;
+  EditRecipe: { recipeId: string };
+  WhatCanIMake: undefined;
 };
 
 const Stack = createNativeStackNavigator<RecipesStackParamList>();
@@ -50,7 +49,8 @@ export default function RecipesStack() {
       <Stack.Screen name="SavedRecipes" component={SavedRecipesScreen} options={{ title: 'Saved Recipes' }} />
       <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} options={{ title: 'Recipe' }} />
       <Stack.Screen name="ImportRecipe" component={ImportRecipeScreen} options={{ title: 'Import Recipe' }} />
-      <Stack.Screen name="ImportReview" component={ImportReviewScreen} options={{ title: 'Review Import' }} />
+      <Stack.Screen name="EditRecipe" component={EditRecipeScreen} options={{ title: 'Edit Recipe' }} />
+      <Stack.Screen name="WhatCanIMake" component={WhatCanIMakeScreen} options={{ title: 'What Can I Make?' }} />
     </Stack.Navigator>
   );
 }

@@ -30,12 +30,19 @@ export default function SavedRecipesScreen({ navigation }: Props) {
   const openRecipe = (recipe: SavedRecipe) => {
     navigation.navigate('RecipeDetail', {
       mode: 'saved',
+      id: recipe.id,
       title: recipe.title,
       image: recipe.image_url,
       ingredients: (recipe.ingredients as string[]) ?? [],
       steps: (recipe.steps as string[]) ?? [],
       sourceType: recipe.source_type,
       sourceUrl: recipe.source_url,
+      rawCaption: recipe.raw_caption,
+      servings: recipe.servings,
+      caloriesPerServing: recipe.calories_per_serving,
+      proteinPerServingG: recipe.protein_per_serving_g,
+      carbsPerServingG: recipe.carbs_per_serving_g,
+      fatPerServingG: recipe.fat_per_serving_g,
     });
   };
 
@@ -60,7 +67,9 @@ export default function SavedRecipesScreen({ navigation }: Props) {
             <View style={styles.rowImagePlaceholder} />
           )}
           <View style={styles.rowText}>
-            <Text style={styles.rowTitle}>{item.title}</Text>
+            <Text style={styles.rowTitle} numberOfLines={2} ellipsizeMode="tail">
+              {item.title}
+            </Text>
             <Text style={styles.rowSource}>{item.source_type}</Text>
           </View>
         </Pressable>

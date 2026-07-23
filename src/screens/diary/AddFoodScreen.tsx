@@ -26,7 +26,10 @@ export default function AddFoodScreen({ navigation }: Props) {
   const [results, setResults] = useState<UsdaFoodResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loggingId, setLoggingId] = useState<number | null>(null);
+
+  const [selectedFood, setSelectedFood] = useState<UsdaFoodResult | null>(null);
+  const [servings, setServings] = useState('1');
+  const [isLogging, setIsLogging] = useState(false);
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -35,6 +38,7 @@ export default function AddFoodScreen({ navigation }: Props) {
     try {
       const foods = await searchUsdaFoods(query.trim());
       setResults(foods);
+      setSelectedFood(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Search failed');
     } finally {
@@ -42,21 +46,33 @@ export default function AddFoodScreen({ navigation }: Props) {
     }
   };
 
-  const handleLog = async (food: UsdaFoodResult) => {
-    if (!session) return;
-    setLoggingId(food.fdcId);
+  const selectFood = (food: UsdaFoodResult) => {
+    setSelectedFood(food);
+    setServings('1');
+    setError(null);
+  };
+
+  const handleLog = async () => {
+    if (!session || !selectedFood) return;
+    const quantity = Number(servings);
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      setError('Enter a valid number of servings.');
+      return;
+    }
+    setError(null);
+    setIsLogging(true);
     const { error: insertError } = await supabase.from('food_logs').insert({
       user_id: session.user.id,
-      food_name: food.description,
-      calories: Math.round(food.calories),
-      protein_g: food.proteinG,
-      carbs_g: food.carbsG,
-      fat_g: food.fatG,
+      food_name: selectedFood.description,
+      calories: Math.round(selectedFood.calories * quantity),
+      protein_g: selectedFood.proteinG != null ? selectedFood.proteinG * quantity : null,
+      carbs_g: selectedFood.carbsG != null ? selectedFood.carbsG * quantity : null,
+      fat_g: selectedFood.fatG != null ? selectedFood.fatG * quantity : null,
       source: 'usda',
       meal_type: mealType,
       logged_at: new Date().toISOString(),
     });
-    setLoggingId(null);
+    setIsLogging(false);
     if (insertError) {
       setError(insertError.message);
       return;
@@ -100,18 +116,50 @@ export default function AddFoodScreen({ navigation }: Props) {
       <FlatList
         data={results}
         keyExtractor={(item) => String(item.fdcId)}
-        renderItem={({ item }) => (
-          <Pressable style={styles.resultRow} onPress={() => handleLog(item)} disabled={loggingId === item.fdcId}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.resultName}>{item.description}</Text>
-              <Text style={styles.resultMacros}>
-                {Math.round(item.calories)} cal
-                {item.proteinG != null ? ` · ${Math.round(item.proteinG)}g protein` : ''}
-              </Text>
+        renderItem={({ item }) => {
+          const isSelected = selectedFood?.fdcId === item.fdcId;
+          return (
+            <View>
+              <Pressable style={styles.resultRow} onPress={() => selectFood(item)}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.resultName}>{item.description}</Text>
+                  <Text style={styles.resultMacros}>
+                    {Math.round(item.calories)} cal per serving
+                    {item.proteinG != null ? ` · ${Math.round(item.proteinG)}g protein` : ''}
+                  </Text>
+                </View>
+                <Text style={styles.addLabel}>{isSelected ? '▲' : 'Select'}</Text>
+              </Pressable>
+
+              {isSelected ? (
+                <View style={styles.logCard}>
+                  <View style={styles.logRow}>
+                    <TextInput
+                      style={styles.servingsInput}
+                      value={servings}
+                      onChangeText={setServings}
+                      keyboardType="decimal-pad"
+                    />
+                    <Text style={styles.servingsLabel}>serving(s)</Text>
+                    <Pressable style={styles.logButton} onPress={handleLog} disabled={isLogging}>
+                      {isLogging ? (
+                        <ActivityIndicator color="#fff" />
+                      ) : (
+                        <Text style={styles.logButtonText}>Add</Text>
+                      )}
+                    </Pressable>
+                  </View>
+                  <Text style={styles.previewText}>
+                    = {Math.round(item.calories * (Number(servings) || 0))} cal
+                    {item.proteinG != null
+                      ? ` · ${Math.round(item.proteinG * (Number(servings) || 0))}g protein`
+                      : ''}
+                  </Text>
+                </View>
+              ) : null}
             </View>
-            {loggingId === item.fdcId ? <ActivityIndicator /> : <Text style={styles.addLabel}>Add</Text>}
-          </Pressable>
-        )}
+          );
+        }}
       />
     </View>
   );
@@ -157,4 +205,31 @@ const styles = StyleSheet.create({
   resultName: { fontSize: 15, fontWeight: '500' },
   resultMacros: { fontSize: 13, color: '#666', marginTop: 2 },
   addLabel: { color: '#2f9e44', fontWeight: '600' },
+  logCard: {
+    backgroundColor: '#f4f9f4',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+  },
+  logRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  servingsInput: {
+    width: 56,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 15,
+    backgroundColor: '#fff',
+    textAlign: 'center',
+  },
+  servingsLabel: { fontSize: 13, color: '#666' },
+  logButton: {
+    flex: 1,
+    backgroundColor: '#2f9e44',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+  },
+  logButtonText: { color: '#fff', fontWeight: '600' },
+  previewText: { fontSize: 12, color: '#666', marginTop: 8 },
 });

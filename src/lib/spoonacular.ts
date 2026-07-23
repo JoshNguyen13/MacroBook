@@ -10,6 +10,7 @@ export interface SpoonacularRecipeSummary {
   extendedIngredients?: { original: string }[];
   analyzedInstructions?: { steps: { number: number; step: string }[] }[];
   instructions?: string | null;
+  nutrition?: { nutrients: { name: string; amount: number; unit: string }[] };
 }
 
 export interface SpoonacularIngredientMatch {
@@ -52,6 +53,11 @@ export function higherResImage(url: string | null, size: '240x150' | '556x370' |
   return url.replace(/-\d+x\d+\.(jpg|png)$/i, `-${size}.$1`);
 }
 
+function findNutrient(recipe: SpoonacularRecipeSummary, name: string): number | null {
+  const match = recipe.nutrition?.nutrients.find((n) => n.name === name);
+  return typeof match?.amount === 'number' ? match.amount : null;
+}
+
 export function normalizeRecipe(recipe: SpoonacularRecipeSummary) {
   const ingredients = (recipe.extendedIngredients ?? []).map((i) => i.original);
 
@@ -69,5 +75,10 @@ export function normalizeRecipe(recipe: SpoonacularRecipeSummary) {
     ingredients,
     steps,
     sourceUrl: recipe.sourceUrl ?? null,
+    servings: recipe.servings ?? null,
+    caloriesPerServing: findNutrient(recipe, 'Calories'),
+    proteinPerServingG: findNutrient(recipe, 'Protein'),
+    carbsPerServingG: findNutrient(recipe, 'Carbohydrates'),
+    fatPerServingG: findNutrient(recipe, 'Fat'),
   };
 }

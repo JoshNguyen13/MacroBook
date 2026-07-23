@@ -61,11 +61,14 @@ export default function RecipesScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.linkRow}>
-        <Pressable style={styles.savedLink} onPress={() => navigation.navigate('SavedRecipes')}>
-          <Text style={styles.savedLinkText}>View saved recipes →</Text>
+        <Pressable style={styles.actionButton} onPress={() => navigation.navigate('SavedRecipes')}>
+          <Text style={styles.actionButtonText}>Saved Recipes</Text>
         </Pressable>
-        <Pressable style={styles.savedLink} onPress={() => navigation.navigate('ImportRecipe')}>
-          <Text style={styles.savedLinkText}>Import from a link →</Text>
+        <Pressable style={styles.actionButton} onPress={() => navigation.navigate('ImportRecipe')}>
+          <Text style={styles.actionButtonText}>Import from Link</Text>
+        </Pressable>
+        <Pressable style={styles.actionButton} onPress={() => navigation.navigate('WhatCanIMake')}>
+          <Text style={styles.actionButtonText}>What Can I Make?</Text>
         </Pressable>
       </View>
 
@@ -106,9 +109,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   searchButtonText: { color: '#fff', fontWeight: '600' },
-  linkRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  savedLink: { marginBottom: 12 },
-  savedLinkText: { color: '#2f9e44', fontWeight: '600' },
+  linkRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
+  actionButton: {
+    flexGrow: 1,
+    backgroundColor: '#f4f9f4',
+    borderWidth: 1,
+    borderColor: '#2f9e44',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+  },
+  actionButtonText: { color: '#2f9e44', fontWeight: '600', fontSize: 13 },
   error: { color: '#e03131', marginBottom: 8 },
   card: { marginBottom: 16 },
   cardImage: { width: '100%', height: 160, borderRadius: 10, backgroundColor: '#eee' },

@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
       `&number=${number}&ranking=1&ignorePantry=true&apiKey=${apiKey}`;
   } else if (mode === 'detail') {
     const id = url.searchParams.get('id') ?? '';
-    spoonacularUrl = `${SPOONACULAR_BASE}/${encodeURIComponent(id)}/information?includeNutrition=false&apiKey=${apiKey}`;
+    spoonacularUrl = `${SPOONACULAR_BASE}/${encodeURIComponent(id)}/information?includeNutrition=true&apiKey=${apiKey}`;
   } else {
     const query = url.searchParams.get('query') ?? '';
     const number = url.searchParams.get('number') ?? '10';

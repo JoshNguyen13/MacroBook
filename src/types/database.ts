@@ -1,5 +1,5 @@
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
-export type FoodSource = 'usda' | 'manual';
+export type FoodSource = 'usda' | 'manual' | 'recipe';
 export type RecipeSourceType = 'spoonacular' | 'youtube' | 'tiktok' | 'instagram' | 'manual';
 
 export type Profile = {
@@ -35,6 +35,11 @@ export type SavedRecipe = {
   source_url: string | null;
   raw_caption: string | null;
   image_url: string | null;
+  servings: number | null;
+  calories_per_serving: number | null;
+  protein_per_serving_g: number | null;
+  carbs_per_serving_g: number | null;
+  fat_per_serving_g: number | null;
   created_at: string;
 };
 
