@@ -9,6 +9,13 @@ import type { FoodLog, MealType } from '../../types/database';
 
 type Props = NativeStackScreenProps<DiaryStackParamList, 'Diary'>;
 
+interface Goals {
+  calories: number | null;
+  proteinG: number | null;
+  carbsG: number | null;
+  fatG: number | null;
+}
+
 const MEAL_ORDER: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
 
 function startOfTodayIso() {
@@ -23,10 +30,29 @@ function endOfTodayIso() {
   return d.toISOString();
 }
 
+function MacroBar({ label, value, goal }: { label: string; value: number; goal: number | null }) {
+  const pct = goal ? Math.min(value / goal, 1) : 0;
+  return (
+    <View style={styles.macroBarRow}>
+      <View style={styles.macroBarLabelRow}>
+        <Text style={styles.macroBarLabel}>{label}</Text>
+        <Text style={styles.macroBarValue}>
+          {Math.round(value)}g{goal ? ` / ${goal}g` : ''}
+        </Text>
+      </View>
+      {goal ? (
+        <View style={styles.macroBarTrack}>
+          <View style={[styles.macroBarFill, { width: `${pct * 100}%` }]} />
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
 export default function DiaryScreen({ navigation }: Props) {
   const { session } = useAuth();
   const [logs, setLogs] = useState<FoodLog[]>([]);
-  const [calorieGoal, setCalorieGoal] = useState<number | null>(null);
+  const [goals, setGoals] = useState<Goals>({ calories: null, proteinG: null, carbsG: null, fatG: null });
 
   const loadData = useCallback(async () => {
     if (!session) return;
@@ -39,11 +65,22 @@ export default function DiaryScreen({ navigation }: Props) {
         .gte('logged_at', startOfTodayIso())
         .lte('logged_at', endOfTodayIso())
         .order('logged_at', { ascending: true }),
-      supabase.from('profiles').select('daily_calorie_goal').eq('id', session.user.id).single(),
+      supabase
+        .from('profiles')
+        .select('daily_calorie_goal, protein_goal_g, carbs_goal_g, fat_goal_g')
+        .eq('id', session.user.id)
+        .single(),
     ]);
 
     if (logsResult.data) setLogs(logsResult.data);
-    if (profileResult.data) setCalorieGoal(profileResult.data.daily_calorie_goal);
+    if (profileResult.data) {
+      setGoals({
+        calories: profileResult.data.daily_calorie_goal,
+        proteinG: profileResult.data.protein_goal_g,
+        carbsG: profileResult.data.carbs_goal_g,
+        fatG: profileResult.data.fat_goal_g,
+      });
+    }
   }, [session]);
 
   useFocusEffect(
@@ -53,7 +90,11 @@ export default function DiaryScreen({ navigation }: Props) {
   );
 
   const totalCalories = logs.reduce((sum, log) => sum + log.calories, 0);
-  const remaining = calorieGoal != null ? calorieGoal - totalCalories : null;
+  const totalProtein = logs.reduce((sum, log) => sum + (log.protein_g ?? 0), 0);
+  const totalCarbs = logs.reduce((sum, log) => sum + (log.carbs_g ?? 0), 0);
+  const totalFat = logs.reduce((sum, log) => sum + (log.fat_g ?? 0), 0);
+  const remaining = goals.calories != null ? goals.calories - totalCalories : null;
+  const hasMacroGoals = goals.proteinG != null || goals.carbsG != null || goals.fatG != null;
 
   const sections = MEAL_ORDER.map((mealType) => ({
     title: mealType[0].toUpperCase() + mealType.slice(1),
@@ -65,12 +106,20 @@ export default function DiaryScreen({ navigation }: Props) {
       <View style={styles.summaryCard}>
         <Text style={styles.totalCalories}>{totalCalories} cal logged</Text>
         <Text style={styles.goalText}>
-          {calorieGoal != null
+          {goals.calories != null
             ? remaining! >= 0
-              ? `${remaining} remaining of ${calorieGoal} goal`
-              : `${Math.abs(remaining!)} over ${calorieGoal} goal`
+              ? `${remaining} remaining of ${goals.calories} goal`
+              : `${Math.abs(remaining!)} over ${goals.calories} goal`
             : 'Set a daily calorie goal in Profile'}
         </Text>
+
+        {totalProtein > 0 || totalCarbs > 0 || totalFat > 0 || hasMacroGoals ? (
+          <View style={styles.macrosSection}>
+            <MacroBar label="Protein" value={totalProtein} goal={goals.proteinG} />
+            <MacroBar label="Carbs" value={totalCarbs} goal={goals.carbsG} />
+            <MacroBar label="Fat" value={totalFat} goal={goals.fatG} />
+          </View>
+        ) : null}
       </View>
 
       <Pressable style={styles.addButton} onPress={() => navigation.navigate('AddFood')}>
@@ -108,6 +157,22 @@ const styles = StyleSheet.create({
   },
   totalCalories: { fontSize: 24, fontWeight: '700' },
   goalText: { fontSize: 14, color: '#666', marginTop: 4 },
+  macrosSection: { marginTop: 16, gap: 10 },
+  macroBarRow: {},
+  macroBarLabelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
+  macroBarLabel: { fontSize: 13, fontWeight: '600', color: '#555' },
+  macroBarValue: { fontSize: 13, color: '#666' },
+  macroBarTrack: {
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#e2ede2',
+    overflow: 'hidden',
+  },
+  macroBarFill: {
+    height: '100%',
+    backgroundColor: '#2f9e44',
+    borderRadius: 3,
+  },
   addButton: {
     backgroundColor: '#2f9e44',
     borderRadius: 8,

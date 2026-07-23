@@ -1,5 +1,5 @@
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
-export type FoodSource = 'usda' | 'manual' | 'recipe';
+export type FoodSource = 'usda' | 'manual' | 'recipe' | 'barcode';
 export type RecipeSourceType = 'spoonacular' | 'youtube' | 'tiktok' | 'instagram' | 'manual';
 
 export type Profile = {

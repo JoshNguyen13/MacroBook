@@ -110,6 +110,10 @@ export default function AddFoodScreen({ navigation }: Props) {
         </Pressable>
       </View>
 
+      <Pressable style={styles.scanButton} onPress={() => navigation.navigate('BarcodeScan')}>
+        <Text style={styles.scanButtonText}>📷 Scan Barcode</Text>
+      </Pressable>
+
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {isSearching ? <ActivityIndicator style={{ marginTop: 16 }} /> : null}
 
@@ -194,6 +198,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   searchButtonText: { color: '#fff', fontWeight: '600' },
+  scanButton: {
+    borderWidth: 1,
+    borderColor: '#2f9e44',
+    borderRadius: 8,
+    padding: 10,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  scanButtonText: { color: '#2f9e44', fontWeight: '600', fontSize: 14 },
   error: { color: '#e03131', marginBottom: 8 },
   resultRow: {
     flexDirection: 'row',

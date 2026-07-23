@@ -28,11 +28,21 @@ async function invoke<T>(query: string): Promise<T> {
   return data as T;
 }
 
-export async function searchRecipes(query: string): Promise<SpoonacularRecipeSummary[]> {
-  const data = await invoke<{ results: SpoonacularRecipeSummary[] }>(
+export interface RecipeSearchResult {
+  results: SpoonacularRecipeSummary[];
+  matchedQuery: string;
+  originalQuery: string;
+}
+
+export async function searchRecipes(query: string): Promise<RecipeSearchResult> {
+  const data = await invoke<{ results: SpoonacularRecipeSummary[]; matchedQuery: string; originalQuery: string }>(
     `mode=search&query=${encodeURIComponent(query)}&number=20`
   );
-  return data.results ?? [];
+  return {
+    results: data.results ?? [],
+    matchedQuery: data.matchedQuery ?? query,
+    originalQuery: data.originalQuery ?? query,
+  };
 }
 
 export async function findRecipesByIngredients(

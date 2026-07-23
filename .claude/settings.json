@@ -25,7 +25,15 @@
       "Bash(curl -s -L -o 'C:\\\\Users\\\\joshn\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-joshn-Downloads-Projects-MacroBook\\\\f1c125f7-3a84-44a7-b1a7-2ce146230bf4\\\\scratchpad\\\\ig_thumb.jpg' 'https://scontent-iad6-1.cdninstagram.com/v/t51.71878-15/744738069_1571270897932853_335449140208961269_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=4v4Qf3osfPkQ7kNvwESeZfd&_nc_oc=AdrJyHPyIHIsh-fGc26bOYL4WW3S6gA8U90V-kLtkAkay-XtcAIR3o5vSW4MA6XkiGMXRjsUONBMe4mJQ7668Dnq&_nc_zt=23&_nc_ht=scontent-iad6-1.cdninstagram.com&_nc_gid=veVJfCxd3l9XNrmdmU_VWA&_nc_ss=7b60f&oh=00_AQBJP3dF0XMYySYXmZQB2YYtkBDDMpaelMPYH5VDKc8Vbg&oe=6A6796C2')",
       "Bash(curl -s -L -o 'C:\\\\Users\\\\joshn\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-joshn-Downloads-Projects-MacroBook\\\\f1c125f7-3a84-44a7-b1a7-2ce146230bf4\\\\scratchpad/ig_thumb.jpg' 'https://scontent-iad6-1.cdninstagram.com/v/t51.71878-15/744738069_1571270897932853_335449140208961269_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=4v4Qf3osfPkQ7kNvwESeZfd&_nc_oc=AdrJyHPyIHIsh-fGc26bOYL4WW3S6gA8U90V-kLtkAkay-XtcAIR3o5vSW4MA6XkiGMXRjsUONBMe4mJQ7668Dnq&_nc_zt=23&_nc_ht=scontent-iad6-1.cdninstagram.com&_nc_gid=veVJfCxd3l9XNrmdmU_VWA&_nc_ss=7b60f&oh=00_AQBJP3dF0XMYySYXmZQB2YYtkBDDMpaelMPYH5VDKc8Vbg&oe=6A6796C2')",
       "Bash(curl -s -o 'C:\\\\Users\\\\joshn\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-joshn-Downloads-Projects-MacroBook\\\\f1c125f7-3a84-44a7-b1a7-2ce146230bf4\\\\scratchpad/spoon_thumb.jpg' https://img.spoonacular.com/recipes/657933-556x370.jpg)",
-      "Bash(node \"C:\\\\Users\\\\joshn\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-joshn-Downloads-Projects-MacroBook\\\\f1c125f7-3a84-44a7-b1a7-2ce146230bf4\\\\scratchpad\\\\test_captions.js\")"
+      "Bash(node \"C:\\\\Users\\\\joshn\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-joshn-Downloads-Projects-MacroBook\\\\f1c125f7-3a84-44a7-b1a7-2ce146230bf4\\\\scratchpad\\\\test_captions.js\")",
+      "WebFetch(domain:spoonacular.com)",
+      "WebFetch(domain:www.themealdb.com)",
+      "WebFetch(domain:developer.edamam.com)",
+      "WebFetch(domain:developers.google.com)",
+      "WebFetch(domain:docs.expo.dev)",
+      "WebFetch(domain:openfoodfacts.github.io)",
+      "Bash(curl -s \"https://world.openfoodfacts.org/api/v2/product/3017620422003.json\")",
+      "Bash(curl -s \"https://world.openfoodfacts.org/api/v2/product/3017620422003.json?fields=product_name,nutriments,serving_size,serving_quantity,image_front_url,nutrition_data_per\")"
     ]
   }
 }

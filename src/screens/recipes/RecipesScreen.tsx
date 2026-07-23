@@ -18,6 +18,7 @@ type Props = NativeStackScreenProps<RecipesStackParamList, 'RecipesSearch'>;
 export default function RecipesScreen({ navigation }: Props) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SpoonacularRecipeSummary[]>([]);
+  const [matchedQuery, setMatchedQuery] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,8 +27,9 @@ export default function RecipesScreen({ navigation }: Props) {
     setError(null);
     setIsSearching(true);
     try {
-      const recipes = await searchRecipes(query.trim());
+      const { results: recipes, matchedQuery: matched, originalQuery } = await searchRecipes(query.trim());
       setResults(recipes);
+      setMatchedQuery(matched !== originalQuery ? matched : null);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Search failed');
     } finally {
@@ -73,6 +75,9 @@ export default function RecipesScreen({ navigation }: Props) {
       </View>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
+      {matchedQuery ? (
+        <Text style={styles.relaxedNote}>No exact match — showing results for "{matchedQuery}" instead.</Text>
+      ) : null}
       {isSearching ? <ActivityIndicator style={{ marginTop: 16 }} /> : null}
 
       <FlatList
@@ -122,6 +127,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: { color: '#2f9e44', fontWeight: '600', fontSize: 13 },
   error: { color: '#e03131', marginBottom: 8 },
+  relaxedNote: { color: '#999', fontSize: 12, marginBottom: 8, fontStyle: 'italic' },
   card: { marginBottom: 16 },
   cardImage: { width: '100%', height: 160, borderRadius: 10, backgroundColor: '#eee' },
   cardTitle: { fontSize: 16, fontWeight: '600', marginTop: 6 },
