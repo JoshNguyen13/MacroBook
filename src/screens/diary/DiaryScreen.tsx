@@ -7,7 +7,7 @@ import { useAuth } from '../../lib/AuthContext';
 import type { DiaryStackParamList } from '../../navigation/DiaryStack';
 import type { FoodLog, MealType } from '../../types/database';
 
-type Props = NativeStackScreenProps<DiaryStackParamList, 'Diary'>;
+type Props = NativeStackScreenProps<DiaryStackParamList, 'DiaryHome'>;
 
 interface Goals {
   calories: number | null;
@@ -122,9 +122,14 @@ export default function DiaryScreen({ navigation }: Props) {
         ) : null}
       </View>
 
-      <Pressable style={styles.addButton} onPress={() => navigation.navigate('AddFood')}>
-        <Text style={styles.addButtonText}>+ Log Food</Text>
-      </Pressable>
+      <View style={styles.actionRow}>
+        <Pressable style={styles.addButton} onPress={() => navigation.navigate('AddFood')}>
+          <Text style={styles.addButtonText}>+ Log Food</Text>
+        </Pressable>
+        <Pressable style={styles.weeklyButton} onPress={() => navigation.navigate('WeeklySummary')}>
+          <Text style={styles.weeklyButtonText}>Weekly Summary</Text>
+        </Pressable>
+      </View>
 
       {sections.length === 0 ? (
         <Text style={styles.empty}>Nothing logged yet today.</Text>
@@ -173,14 +178,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#2f9e44',
     borderRadius: 3,
   },
+  actionRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
   addButton: {
+    flex: 1,
     backgroundColor: '#2f9e44',
     borderRadius: 8,
     padding: 12,
     alignItems: 'center',
-    marginBottom: 16,
   },
   addButtonText: { color: '#fff', fontWeight: '600', fontSize: 15 },
+  weeklyButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#2f9e44',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+  },
+  weeklyButtonText: { color: '#2f9e44', fontWeight: '600', fontSize: 15 },
   empty: { textAlign: 'center', color: '#999', marginTop: 32 },
   sectionHeader: {
     fontSize: 13,

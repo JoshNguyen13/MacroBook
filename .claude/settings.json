@@ -33,7 +33,9 @@
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:openfoodfacts.github.io)",
       "Bash(curl -s \"https://world.openfoodfacts.org/api/v2/product/3017620422003.json\")",
-      "Bash(curl -s \"https://world.openfoodfacts.org/api/v2/product/3017620422003.json?fields=product_name,nutriments,serving_size,serving_quantity,image_front_url,nutrition_data_per\")"
+      "Bash(curl -s \"https://world.openfoodfacts.org/api/v2/product/3017620422003.json?fields=product_name,nutriments,serving_size,serving_quantity,image_front_url,nutrition_data_per\")",
+      "WebFetch(domain:expo.dev)",
+      "Bash(timeout 20 npx vercel dist --prod --yes)"
     ]
   }
 }
