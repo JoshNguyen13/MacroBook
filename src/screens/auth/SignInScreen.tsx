@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { supabase } from '../../lib/supabase';
+import { colors, radius, spacing } from '../../theme';
+import Button from '../../components/Button';
 import type { AuthStackParamList } from '../../navigation/AuthStack';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'SignIn'>;
@@ -43,9 +45,7 @@ export default function SignInScreen({ navigation }: Props) {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <Pressable style={styles.button} onPress={handleSignIn} disabled={isLoading}>
-        {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Log In</Text>}
-      </Pressable>
+      <Button title="Log In" onPress={handleSignIn} loading={isLoading} style={{ marginTop: spacing.sm }} />
 
       <Pressable onPress={() => navigation.navigate('SignUp')}>
         <Text style={styles.link}>Don&apos;t have an account? Sign up</Text>
@@ -55,25 +55,19 @@ export default function SignInScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#fff' },
-  title: { fontSize: 32, fontWeight: '700', textAlign: 'center', marginBottom: 4 },
-  subtitle: { fontSize: 15, color: '#666', textAlign: 'center', marginBottom: 32 },
+  container: { flex: 1, justifyContent: 'center', padding: spacing.xl, backgroundColor: colors.background },
+  title: { fontSize: 40, fontWeight: '800', color: colors.primaryDark, textAlign: 'center', marginBottom: spacing.xs },
+  subtitle: { fontSize: 15, color: colors.inkSoft, textAlign: 'center', marginBottom: spacing.xxl },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
+    padding: spacing.md,
+    marginBottom: spacing.md,
     fontSize: 16,
+    backgroundColor: colors.surface,
+    color: colors.ink,
   },
-  button: {
-    backgroundColor: '#2f9e44',
-    borderRadius: 8,
-    padding: 14,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  link: { color: '#2f9e44', textAlign: 'center', marginTop: 16 },
-  error: { color: '#e03131', marginBottom: 8 },
+  link: { color: colors.primaryDark, textAlign: 'center', marginTop: spacing.lg },
+  error: { color: colors.error, marginBottom: spacing.sm },
 });

@@ -1,20 +1,14 @@
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  Image,
-  FlatList,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TextInput, Pressable, Image, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   findRecipesByIngredients,
   higherResImage,
   type SpoonacularIngredientMatch,
 } from '../../lib/spoonacular';
+import { colors, radius, spacing } from '../../theme';
+import Button from '../../components/Button';
 import type { RecipesStackParamList } from '../../navigation/RecipesStack';
 
 type Props = NativeStackScreenProps<RecipesStackParamList, 'WhatCanIMake'>;
@@ -73,32 +67,27 @@ export default function WhatCanIMakeScreen({ navigation }: Props) {
           onSubmitEditing={addIngredient}
           returnKeyType="done"
         />
-        <Pressable style={styles.addButton} onPress={addIngredient}>
-          <Text style={styles.addButtonText}>Add</Text>
-        </Pressable>
+        <Button title="Add" onPress={addIngredient} />
       </View>
 
       {ingredients.length > 0 ? (
         <View style={styles.chipRow}>
           {ingredients.map((ingredient) => (
             <Pressable key={ingredient} style={styles.chip} onPress={() => removeIngredient(ingredient)}>
-              <Text style={styles.chipText}>{ingredient} ✕</Text>
+              <Text style={styles.chipText}>{ingredient}</Text>
+              <Ionicons name="close" size={14} color={colors.primaryDark} />
             </Pressable>
           ))}
         </View>
       ) : null}
 
-      <Pressable
-        style={[styles.searchButton, ingredients.length === 0 && styles.searchButtonDisabled]}
+      <Button
+        title="Find Recipes"
         onPress={handleSearch}
-        disabled={ingredients.length === 0 || isSearching}
-      >
-        {isSearching ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.searchButtonText}>Find Recipes</Text>
-        )}
-      </Pressable>
+        loading={isSearching}
+        disabled={ingredients.length === 0}
+        style={{ marginBottom: spacing.sm }}
+      />
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -131,47 +120,36 @@ export default function WhatCanIMakeScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 16 },
-  subtitle: { fontSize: 14, color: '#666', marginBottom: 16 },
-  inputRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
+  container: { flex: 1, backgroundColor: colors.background, padding: spacing.lg },
+  subtitle: { fontSize: 14, color: colors.inkSoft, marginBottom: spacing.lg },
+  inputRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.md },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
+    padding: spacing.md,
     fontSize: 16,
+    backgroundColor: colors.surface,
+    color: colors.ink,
   },
-  addButton: {
-    backgroundColor: '#2f9e44',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    justifyContent: 'center',
-  },
-  addButtonText: { color: '#fff', fontWeight: '600' },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
   chip: {
-    backgroundColor: '#f4f9f4',
-    borderRadius: 16,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  chipText: { color: '#2f9e44', fontSize: 13, fontWeight: '600' },
-  searchButton: {
-    backgroundColor: '#2f9e44',
-    borderRadius: 8,
-    padding: 14,
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    gap: spacing.xs,
+    backgroundColor: colors.surfaceTint,
+    borderRadius: radius.pill,
+    paddingVertical: 6,
+    paddingHorizontal: spacing.md,
   },
-  searchButtonDisabled: { backgroundColor: '#adb5bd' },
-  searchButtonText: { color: '#fff', fontWeight: '600', fontSize: 15 },
-  error: { color: '#e03131', marginBottom: 8 },
-  results: { marginTop: 8 },
-  card: { flexDirection: 'row', marginBottom: 16, gap: 12 },
-  cardImage: { width: 88, height: 88, borderRadius: 10, backgroundColor: '#eee' },
+  chipText: { color: colors.primaryDark, fontSize: 13, fontWeight: '600' },
+  error: { color: colors.error, marginBottom: spacing.sm },
+  results: { marginTop: spacing.sm },
+  card: { flexDirection: 'row', marginBottom: spacing.lg, gap: spacing.md },
+  cardImage: { width: 88, height: 88, borderRadius: radius.md, backgroundColor: colors.surfaceTint },
   cardBody: { flex: 1, justifyContent: 'center' },
-  cardTitle: { fontSize: 15, fontWeight: '600' },
-  cardMatch: { fontSize: 12, color: '#2f9e44', marginTop: 4, fontWeight: '600' },
-  cardMissing: { fontSize: 12, color: '#999', marginTop: 2 },
+  cardTitle: { fontSize: 15, fontWeight: '600', color: colors.ink },
+  cardMatch: { fontSize: 12, color: colors.primaryDark, marginTop: spacing.xs, fontWeight: '600' },
+  cardMissing: { fontSize: 12, color: colors.inkMuted, marginTop: 2 },
 });

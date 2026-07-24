@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/AuthContext';
+import { colors, radius, spacing } from '../../theme';
 import type { RecipesStackParamList } from '../../navigation/RecipesStack';
 import type { SavedRecipe } from '../../types/database';
 
@@ -79,19 +80,19 @@ export default function SavedRecipesScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 16 },
-  empty: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
-  emptyText: { color: '#999' },
+  container: { flex: 1, backgroundColor: colors.background, padding: spacing.lg },
+  empty: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background },
+  emptyText: { color: colors.inkMuted },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: colors.border,
   },
-  rowImage: { width: 56, height: 56, borderRadius: 8, backgroundColor: '#eee', marginRight: 12 },
-  rowImagePlaceholder: { width: 56, height: 56, borderRadius: 8, backgroundColor: '#f0f0f0', marginRight: 12 },
+  rowImage: { width: 56, height: 56, borderRadius: radius.md, backgroundColor: colors.surfaceTint, marginRight: spacing.md },
+  rowImagePlaceholder: { width: 56, height: 56, borderRadius: radius.md, backgroundColor: colors.surfaceTint, marginRight: spacing.md },
   rowText: { flex: 1 },
-  rowTitle: { fontSize: 15, fontWeight: '500' },
-  rowSource: { fontSize: 12, color: '#999', marginTop: 2, textTransform: 'capitalize' },
+  rowTitle: { fontSize: 15, fontWeight: '500', color: colors.ink },
+  rowSource: { fontSize: 12, color: colors.inkMuted, marginTop: 2, textTransform: 'capitalize' },
 });

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/AuthContext';
+import { colors, radius, spacing } from '../../theme';
+import Button from '../../components/Button';
 
 export default function ProfileScreen() {
   const { session } = useAuth();
@@ -105,9 +107,7 @@ export default function ProfileScreen() {
 
       {status ? <Text style={styles.status}>{status}</Text> : null}
 
-      <Pressable style={styles.button} onPress={saveGoals}>
-        <Text style={styles.buttonText}>Save</Text>
-      </Pressable>
+      <Button title="Save" onPress={saveGoals} style={{ marginBottom: spacing.xl }} />
 
       <Pressable style={styles.signOut} onPress={() => supabase.auth.signOut()}>
         <Text style={styles.signOutText}>Sign out</Text>
@@ -117,30 +117,24 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, backgroundColor: '#fff' },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 4, marginTop: 16 },
-  email: { fontSize: 14, color: '#666', marginBottom: 24 },
-  label: { fontSize: 14, fontWeight: '600', marginBottom: 6 },
-  sectionLabel: { fontSize: 14, fontWeight: '600', marginTop: 8, marginBottom: 6, color: '#555' },
+  container: { flex: 1, padding: spacing.xl, backgroundColor: colors.background },
+  title: { fontSize: 22, fontWeight: '700', color: colors.ink, marginBottom: spacing.xs, marginTop: spacing.lg },
+  email: { fontSize: 14, color: colors.inkSoft, marginBottom: spacing.xl },
+  label: { fontSize: 14, fontWeight: '600', color: colors.ink, marginBottom: spacing.sm },
+  sectionLabel: { fontSize: 14, fontWeight: '600', color: colors.inkSoft, marginTop: spacing.sm, marginBottom: spacing.sm },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
+    padding: spacing.md,
+    marginBottom: spacing.md,
     fontSize: 16,
+    backgroundColor: colors.surface,
+    color: colors.ink,
   },
-  macroRow: { flexDirection: 'row', gap: 8 },
+  macroRow: { flexDirection: 'row', gap: spacing.sm },
   macroField: { flex: 1 },
-  status: { color: '#2f9e44', marginBottom: 8 },
-  button: {
-    backgroundColor: '#2f9e44',
-    borderRadius: 8,
-    padding: 14,
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  signOut: { alignItems: 'center', padding: 12 },
-  signOutText: { color: '#e03131', fontSize: 15 },
+  status: { color: colors.primaryDark, marginBottom: spacing.sm },
+  signOut: { alignItems: 'center', padding: spacing.md },
+  signOutText: { color: colors.error, fontSize: 15 },
 });

@@ -1,20 +1,14 @@
 import { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  Pressable,
-  TextInput,
-  Linking,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, Image, ScrollView, Pressable, TextInput, Linking, StyleSheet, ActivityIndicator } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/AuthContext';
 import { getRecipeDetail, normalizeRecipe } from '../../lib/spoonacular';
 import { confirmAsync } from '../../lib/confirm';
+import { colors, radius, spacing } from '../../theme';
+import MealTypePillSelector from '../../components/MealTypePillSelector';
+import Button from '../../components/Button';
+import StatPill from '../../components/StatPill';
 import type { RecipesStackParamList } from '../../navigation/RecipesStack';
 import type { MealType } from '../../types/database';
 
@@ -33,8 +27,6 @@ interface RecipeContent {
   carbsPerServingG: number | null;
   fatPerServingG: number | null;
 }
-
-const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
 
 export default function RecipeDetailScreen({ route, navigation }: Props) {
   const params = route.params;
@@ -154,7 +146,7 @@ export default function RecipeDetailScreen({ route, navigation }: Props) {
   if (isLoading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -170,7 +162,7 @@ export default function RecipeDetailScreen({ route, navigation }: Props) {
   const hasNutrition = content.caloriesPerServing != null;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ padding: 16 }}>
+    <ScrollView style={styles.container} contentContainerStyle={{ padding: spacing.lg }}>
       {content.image ? <Image source={{ uri: content.image }} style={styles.image} /> : null}
       <Text style={styles.title}>{content.title}</Text>
 
@@ -181,34 +173,30 @@ export default function RecipeDetailScreen({ route, navigation }: Props) {
       ) : null}
 
       {params.mode === 'spoonacular' ? (
-        <Pressable
-          style={[styles.saveButton, saved && styles.saveButtonSaved]}
+        <Button
+          title={saved ? 'Saved' : 'Save Recipe'}
           onPress={handleSave}
-          disabled={isSaving || saved}
-        >
-          {isSaving ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.saveButtonText}>{saved ? 'Saved' : 'Save Recipe'}</Text>
-          )}
-        </Pressable>
+          loading={isSaving}
+          disabled={saved}
+          style={{ marginBottom: spacing.lg }}
+        />
       ) : null}
 
       {params.mode === 'saved' ? (
         <View style={styles.savedActionsRow}>
-          <Pressable
-            style={styles.editButton}
+          <Button
+            title="Edit"
+            variant="outline"
             onPress={() => navigation.navigate('EditRecipe', { recipeId: params.id })}
-          >
-            <Text style={styles.editButtonText}>Edit</Text>
-          </Pressable>
-          <Pressable style={styles.unsaveButton} onPress={handleUnsave} disabled={isUnsaving}>
-            {isUnsaving ? (
-              <ActivityIndicator color="#e03131" />
-            ) : (
-              <Text style={styles.unsaveButtonText}>Remove from Saved</Text>
-            )}
-          </Pressable>
+            style={{ flex: 1 }}
+          />
+          <Button
+            title="Remove from Saved"
+            variant="danger"
+            onPress={handleUnsave}
+            loading={isUnsaving}
+            style={{ flex: 1 }}
+          />
         </View>
       ) : null}
 
@@ -220,27 +208,21 @@ export default function RecipeDetailScreen({ route, navigation }: Props) {
           <Text style={styles.nutritionTitle}>
             Nutrition per serving{content.servings ? ` (serves ${content.servings})` : ''}
           </Text>
-          <Text style={styles.nutritionRow}>{Math.round(content.caloriesPerServing!)} cal</Text>
-          <Text style={styles.nutritionRow}>
-            {content.proteinPerServingG != null ? `${Math.round(content.proteinPerServingG)}g protein` : ''}
-            {content.carbsPerServingG != null ? `  ·  ${Math.round(content.carbsPerServingG)}g carbs` : ''}
-            {content.fatPerServingG != null ? `  ·  ${Math.round(content.fatPerServingG)}g fat` : ''}
-          </Text>
+          <View style={styles.statRow}>
+            <StatPill icon="flame-outline" value={`${Math.round(content.caloriesPerServing!)}`} label="cal" />
+            {content.proteinPerServingG != null ? (
+              <StatPill icon="barbell-outline" value={`${Math.round(content.proteinPerServingG)}g`} label="protein" />
+            ) : null}
+            {content.carbsPerServingG != null ? (
+              <StatPill icon="nutrition-outline" value={`${Math.round(content.carbsPerServingG)}g`} label="carbs" />
+            ) : null}
+            {content.fatPerServingG != null ? (
+              <StatPill icon="water-outline" value={`${Math.round(content.fatPerServingG)}g`} label="fat" />
+            ) : null}
+          </View>
 
           <Text style={styles.logLabel}>Log to diary</Text>
-          <View style={styles.mealRow}>
-            {MEAL_TYPES.map((type) => (
-              <Pressable
-                key={type}
-                style={[styles.mealPill, mealType === type && styles.mealPillActive]}
-                onPress={() => setMealType(type)}
-              >
-                <Text style={[styles.mealPillText, mealType === type && styles.mealPillTextActive]}>
-                  {type[0].toUpperCase() + type.slice(1)}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
+          <MealTypePillSelector value={mealType} onChange={setMealType} />
           <View style={styles.logRow}>
             <TextInput
               style={styles.servingsInput}
@@ -249,17 +231,13 @@ export default function RecipeDetailScreen({ route, navigation }: Props) {
               keyboardType="decimal-pad"
             />
             <Text style={styles.servingsLabel}>serving(s)</Text>
-            <Pressable
-              style={[styles.logButton, logged && styles.saveButtonSaved]}
+            <Button
+              title={logged ? 'Logged' : 'Add to Diary'}
               onPress={handleLogToDiary}
-              disabled={isLogging || logged}
-            >
-              {isLogging ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.logButtonText}>{logged ? 'Logged' : 'Add to Diary'}</Text>
-              )}
-            </Pressable>
+              loading={isLogging}
+              disabled={logged}
+              style={styles.logButton}
+            />
           </View>
           {logError ? <Text style={styles.error}>{logError}</Text> : null}
         </View>
@@ -302,90 +280,45 @@ export default function RecipeDetailScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', padding: 24 },
-  image: { width: '100%', height: 220, borderRadius: 10, backgroundColor: '#eee', marginBottom: 12 },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 4 },
-  sourceLink: { color: '#2f9e44', fontWeight: '600', marginBottom: 12 },
-  saveButton: {
-    backgroundColor: '#2f9e44',
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  saveButtonSaved: { backgroundColor: '#868e96' },
-  saveButtonText: { color: '#fff', fontWeight: '600' },
-  savedActionsRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
-  editButton: {
-    flex: 1,
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#2f9e44',
-  },
-  editButtonText: { color: '#2f9e44', fontWeight: '600' },
-  unsaveButton: {
-    flex: 1,
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e03131',
-  },
-  unsaveButtonText: { color: '#e03131', fontWeight: '600' },
-  error: { color: '#e03131', marginBottom: 8 },
-  sectionTitle: { fontSize: 17, fontWeight: '700', marginTop: 16, marginBottom: 8 },
-  listItem: { fontSize: 15, marginBottom: 6, lineHeight: 21 },
-  captionFallbackHint: { fontSize: 12, color: '#999', marginBottom: 8, lineHeight: 17 },
+  container: { flex: 1, backgroundColor: colors.background },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background, padding: spacing.xl },
+  image: { width: '100%', height: 220, borderRadius: radius.lg, backgroundColor: colors.surfaceTint, marginBottom: spacing.md },
+  title: { fontSize: 22, fontWeight: '700', color: colors.ink, marginBottom: spacing.xs },
+  sourceLink: { color: colors.primaryDark, fontWeight: '600', marginBottom: spacing.md },
+  savedActionsRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.lg },
+  error: { color: colors.error, marginBottom: spacing.sm },
+  sectionTitle: { fontSize: 17, fontWeight: '700', color: colors.ink, marginTop: spacing.lg, marginBottom: spacing.sm },
+  listItem: { fontSize: 15, color: colors.ink, marginBottom: 6, lineHeight: 21 },
+  captionFallbackHint: { fontSize: 12, color: colors.inkMuted, marginBottom: spacing.sm, lineHeight: 17 },
   caption: {
     fontSize: 14,
-    color: '#333',
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    padding: 12,
+    color: colors.inkSoft,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radius.sm,
+    padding: spacing.md,
     lineHeight: 20,
   },
   nutritionCard: {
-    backgroundColor: '#f4f9f4',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 8,
+    backgroundColor: colors.surfaceTint,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.sm,
   },
-  nutritionTitle: { fontSize: 13, fontWeight: '700', color: '#555', marginBottom: 8 },
-  nutritionRow: { fontSize: 15, marginBottom: 2 },
-  logLabel: { fontSize: 13, fontWeight: '700', color: '#555', marginTop: 16, marginBottom: 8 },
-  mealRow: { flexDirection: 'row', gap: 8, marginBottom: 12, flexWrap: 'wrap' },
-  mealPill: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
-  },
-  mealPillActive: { backgroundColor: '#2f9e44', borderColor: '#2f9e44' },
-  mealPillText: { color: '#333', fontSize: 13 },
-  mealPillTextActive: { color: '#fff', fontWeight: '600' },
-  logRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  nutritionTitle: { fontSize: 13, fontWeight: '700', color: colors.inkSoft, marginBottom: spacing.md },
+  statRow: { flexDirection: 'row', justifyContent: 'space-around' },
+  logLabel: { fontSize: 13, fontWeight: '700', color: colors.inkSoft, marginTop: spacing.lg, marginBottom: spacing.sm },
+  logRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.sm },
   servingsInput: {
     width: 56,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
     padding: 10,
     fontSize: 15,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
+    color: colors.ink,
     textAlign: 'center',
   },
-  servingsLabel: { fontSize: 13, color: '#666' },
-  logButton: {
-    flex: 1,
-    backgroundColor: '#2f9e44',
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-  },
-  logButtonText: { color: '#fff', fontWeight: '600' },
+  servingsLabel: { fontSize: 13, color: colors.inkSoft },
+  logButton: { flex: 1 },
 });

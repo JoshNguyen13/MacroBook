@@ -1,23 +1,17 @@
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  FlatList,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TextInput, Pressable, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { searchUsdaFoods, type UsdaFoodResult } from '../../lib/usda';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/AuthContext';
+import { colors, radius, spacing } from '../../theme';
+import MealTypePillSelector from '../../components/MealTypePillSelector';
+import Button from '../../components/Button';
 import type { DiaryStackParamList } from '../../navigation/DiaryStack';
 import type { MealType } from '../../types/database';
 
 type Props = NativeStackScreenProps<DiaryStackParamList, 'AddFood'>;
-
-const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
 
 export default function AddFoodScreen({ navigation }: Props) {
   const { session } = useAuth();
@@ -82,19 +76,7 @@ export default function AddFoodScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.mealRow}>
-        {MEAL_TYPES.map((type) => (
-          <Pressable
-            key={type}
-            style={[styles.mealPill, mealType === type && styles.mealPillActive]}
-            onPress={() => setMealType(type)}
-          >
-            <Text style={[styles.mealPillText, mealType === type && styles.mealPillTextActive]}>
-              {type[0].toUpperCase() + type.slice(1)}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+      <MealTypePillSelector value={mealType} onChange={setMealType} />
 
       <View style={styles.searchRow}>
         <TextInput
@@ -105,17 +87,16 @@ export default function AddFoodScreen({ navigation }: Props) {
           onSubmitEditing={handleSearch}
           returnKeyType="search"
         />
-        <Pressable style={styles.searchButton} onPress={handleSearch}>
-          <Text style={styles.searchButtonText}>Search</Text>
-        </Pressable>
+        <Button title="Search" onPress={handleSearch} />
       </View>
 
       <Pressable style={styles.scanButton} onPress={() => navigation.navigate('BarcodeScan')}>
-        <Text style={styles.scanButtonText}>📷 Scan Barcode</Text>
+        <Ionicons name="camera-outline" size={18} color={colors.primaryDark} />
+        <Text style={styles.scanButtonText}>Scan Barcode</Text>
       </Pressable>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      {isSearching ? <ActivityIndicator style={{ marginTop: 16 }} /> : null}
+      {isSearching ? <ActivityIndicator style={{ marginTop: spacing.lg }} color={colors.primary} /> : null}
 
       <FlatList
         data={results}
@@ -132,7 +113,11 @@ export default function AddFoodScreen({ navigation }: Props) {
                     {item.proteinG != null ? ` · ${Math.round(item.proteinG)}g protein` : ''}
                   </Text>
                 </View>
-                <Text style={styles.addLabel}>{isSelected ? '▲' : 'Select'}</Text>
+                <Ionicons
+                  name={isSelected ? 'chevron-up' : 'add-circle-outline'}
+                  size={22}
+                  color={colors.primaryDark}
+                />
               </Pressable>
 
               {isSelected ? (
@@ -145,13 +130,12 @@ export default function AddFoodScreen({ navigation }: Props) {
                       keyboardType="decimal-pad"
                     />
                     <Text style={styles.servingsLabel}>serving(s)</Text>
-                    <Pressable style={styles.logButton} onPress={handleLog} disabled={isLogging}>
-                      {isLogging ? (
-                        <ActivityIndicator color="#fff" />
-                      ) : (
-                        <Text style={styles.logButtonText}>Add</Text>
-                      )}
-                    </Pressable>
+                    <Button
+                      title="Add"
+                      onPress={handleLog}
+                      loading={isLogging}
+                      style={styles.logButton}
+                    />
                   </View>
                   <Text style={styles.previewText}>
                     = {Math.round(item.calories * (Number(servings) || 0))} cal
@@ -170,79 +154,59 @@ export default function AddFoodScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 16 },
-  mealRow: { flexDirection: 'row', marginBottom: 16, gap: 8 },
-  mealPill: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  mealPillActive: { backgroundColor: '#2f9e44', borderColor: '#2f9e44' },
-  mealPillText: { color: '#333', fontSize: 13 },
-  mealPillTextActive: { color: '#fff', fontWeight: '600' },
-  searchRow: { flexDirection: 'row', gap: 8, marginBottom: 8 },
+  container: { flex: 1, backgroundColor: colors.background, padding: spacing.lg },
+  searchRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.lg, marginBottom: spacing.sm },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
+    padding: spacing.md,
     fontSize: 16,
+    backgroundColor: colors.surface,
+    color: colors.ink,
   },
-  searchButton: {
-    backgroundColor: '#2f9e44',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    justifyContent: 'center',
-  },
-  searchButtonText: { color: '#fff', fontWeight: '600' },
   scanButton: {
-    borderWidth: 1,
-    borderColor: '#2f9e44',
-    borderRadius: 8,
-    padding: 10,
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    justifyContent: 'center',
+    gap: spacing.xs,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: radius.sm,
+    padding: 10,
+    marginBottom: spacing.lg,
   },
-  scanButtonText: { color: '#2f9e44', fontWeight: '600', fontSize: 14 },
-  error: { color: '#e03131', marginBottom: 8 },
+  scanButtonText: { color: colors.primaryDark, fontWeight: '600', fontSize: 14 },
+  error: { color: colors.error, marginBottom: spacing.sm },
   resultRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: colors.border,
   },
-  resultName: { fontSize: 15, fontWeight: '500' },
-  resultMacros: { fontSize: 13, color: '#666', marginTop: 2 },
-  addLabel: { color: '#2f9e44', fontWeight: '600' },
+  resultName: { fontSize: 15, fontWeight: '500', color: colors.ink },
+  resultMacros: { fontSize: 13, color: colors.inkMuted, marginTop: 2 },
   logCard: {
-    backgroundColor: '#f4f9f4',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
+    backgroundColor: colors.surfaceTint,
+    borderRadius: radius.sm,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
   },
-  logRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  logRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   servingsInput: {
     width: 56,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
     padding: 10,
     fontSize: 15,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
+    color: colors.ink,
     textAlign: 'center',
   },
-  servingsLabel: { fontSize: 13, color: '#666' },
-  logButton: {
-    flex: 1,
-    backgroundColor: '#2f9e44',
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-  },
-  logButtonText: { color: '#fff', fontWeight: '600' },
-  previewText: { fontSize: 12, color: '#666', marginTop: 8 },
+  servingsLabel: { fontSize: 13, color: colors.inkSoft },
+  logButton: { flex: 1 },
+  previewText: { fontSize: 12, color: colors.inkMuted, marginTop: spacing.sm },
 });

@@ -1,21 +1,26 @@
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  Image,
-  FlatList,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TextInput, Pressable, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { searchRecipes, higherResImage, type SpoonacularRecipeSummary } from '../../lib/spoonacular';
+import { colors, radius, spacing } from '../../theme';
+import RecipeCard from '../../components/RecipeCard';
+import Button from '../../components/Button';
 import type { RecipesStackParamList } from '../../navigation/RecipesStack';
 
 type Props = NativeStackScreenProps<RecipesStackParamList, 'RecipesSearch'>;
 
 export default function RecipesScreen({ navigation }: Props) {
+  const ACTIONS: {
+    key: string;
+    label: string;
+    icon: keyof typeof Ionicons.glyphMap;
+    onPress: () => void;
+  }[] = [
+    { key: 'SavedRecipes', label: 'Saved Recipes', icon: 'bookmark-outline', onPress: () => navigation.navigate('SavedRecipes') },
+    { key: 'ImportRecipe', label: 'Import from Link', icon: 'link-outline', onPress: () => navigation.navigate('ImportRecipe') },
+    { key: 'WhatCanIMake', label: 'What Can I Make?', icon: 'bulb-outline', onPress: () => navigation.navigate('WhatCanIMake') },
+  ];
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SpoonacularRecipeSummary[]>([]);
   const [matchedQuery, setMatchedQuery] = useState<string | null>(null);
@@ -57,39 +62,33 @@ export default function RecipesScreen({ navigation }: Props) {
           onSubmitEditing={handleSearch}
           returnKeyType="search"
         />
-        <Pressable style={styles.searchButton} onPress={handleSearch}>
-          <Text style={styles.searchButtonText}>Search</Text>
-        </Pressable>
+        <Button title="Search" onPress={handleSearch} />
       </View>
 
       <View style={styles.linkRow}>
-        <Pressable style={styles.actionButton} onPress={() => navigation.navigate('SavedRecipes')}>
-          <Text style={styles.actionButtonText}>Saved Recipes</Text>
-        </Pressable>
-        <Pressable style={styles.actionButton} onPress={() => navigation.navigate('ImportRecipe')}>
-          <Text style={styles.actionButtonText}>Import from Link</Text>
-        </Pressable>
-        <Pressable style={styles.actionButton} onPress={() => navigation.navigate('WhatCanIMake')}>
-          <Text style={styles.actionButtonText}>What Can I Make?</Text>
-        </Pressable>
+        {ACTIONS.map((action) => (
+          <Pressable key={action.key} style={styles.actionChip} onPress={action.onPress}>
+            <Ionicons name={action.icon} size={18} color={colors.primaryDark} />
+            <Text style={styles.actionChipText}>{action.label}</Text>
+          </Pressable>
+        ))}
       </View>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {matchedQuery ? (
         <Text style={styles.relaxedNote}>No exact match — showing results for "{matchedQuery}" instead.</Text>
       ) : null}
-      {isSearching ? <ActivityIndicator style={{ marginTop: 16 }} /> : null}
+      {isSearching ? <ActivityIndicator style={{ marginTop: spacing.lg }} color={colors.primary} /> : null}
 
       <FlatList
         data={results}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
-          <Pressable style={styles.card} onPress={() => openRecipe(item)}>
-            {item.image ? (
-              <Image source={{ uri: higherResImage(item.image) ?? undefined }} style={styles.cardImage} />
-            ) : null}
-            <Text style={styles.cardTitle}>{item.title}</Text>
-          </Pressable>
+          <RecipeCard
+            title={item.title}
+            image={item.image ? higherResImage(item.image) : null}
+            onPress={() => openRecipe(item)}
+          />
         )}
       />
     </View>
@@ -97,38 +96,33 @@ export default function RecipesScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 16 },
-  headerRow: { flexDirection: 'row', gap: 8, marginBottom: 8 },
+  container: { flex: 1, backgroundColor: colors.background, padding: spacing.lg },
+  headerRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.sm },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
+    padding: spacing.md,
     fontSize: 16,
+    backgroundColor: colors.surface,
+    color: colors.ink,
   },
-  searchButton: {
-    backgroundColor: '#2f9e44',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    justifyContent: 'center',
-  },
-  searchButtonText: { color: '#fff', fontWeight: '600' },
-  linkRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
-  actionButton: {
+  linkRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.lg },
+  actionChip: {
     flexGrow: 1,
-    backgroundColor: '#f4f9f4',
-    borderWidth: 1,
-    borderColor: '#2f9e44',
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    backgroundColor: colors.surfaceTint,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: radius.sm,
+    paddingVertical: 10,
+    paddingHorizontal: spacing.md,
   },
-  actionButtonText: { color: '#2f9e44', fontWeight: '600', fontSize: 13 },
-  error: { color: '#e03131', marginBottom: 8 },
-  relaxedNote: { color: '#999', fontSize: 12, marginBottom: 8, fontStyle: 'italic' },
-  card: { marginBottom: 16 },
-  cardImage: { width: '100%', height: 160, borderRadius: 10, backgroundColor: '#eee' },
-  cardTitle: { fontSize: 16, fontWeight: '600', marginTop: 6 },
+  actionChipText: { color: colors.primaryDark, fontWeight: '600', fontSize: 13 },
+  error: { color: colors.error, marginBottom: spacing.sm },
+  relaxedNote: { color: colors.inkMuted, fontSize: 12, marginBottom: spacing.sm, fontStyle: 'italic' },
 });

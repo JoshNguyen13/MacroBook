@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { View, Text, TextInput, Image, Pressable, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { supabase } from '../../lib/supabase';
 import { parseCaption } from '../../lib/recipeImport';
+import { colors, radius, spacing } from '../../theme';
+import Button from '../../components/Button';
 import type { RecipesStackParamList } from '../../navigation/RecipesStack';
 import type { SavedRecipe } from '../../types/database';
 
@@ -126,7 +129,7 @@ export default function EditRecipeScreen({ route, navigation }: Props) {
   if (isLoading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -140,7 +143,7 @@ export default function EditRecipeScreen({ route, navigation }: Props) {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ padding: 16 }}>
+    <ScrollView style={styles.container} contentContainerStyle={{ padding: spacing.lg }}>
       {recipe.image_url ? <Image source={{ uri: recipe.image_url }} style={styles.image} /> : null}
 
       <Text style={styles.label}>Title</Text>
@@ -168,9 +171,12 @@ export default function EditRecipeScreen({ route, navigation }: Props) {
         <>
           <Pressable style={styles.reparseButton} onPress={handleReparse} disabled={isReparsing}>
             {isReparsing ? (
-              <ActivityIndicator color="#2f9e44" />
+              <ActivityIndicator color={colors.primaryDark} />
             ) : (
-              <Text style={styles.reparseButtonText}>✨ Ingredients/steps not right? Re-parse with AI</Text>
+              <View style={styles.reparseButtonRow}>
+                <Ionicons name="sparkles" size={14} color={colors.primaryDark} />
+                <Text style={styles.reparseButtonText}>Ingredients/steps not right? Re-parse with AI</Text>
+              </View>
             )}
           </Pressable>
           {reparseError ? <Text style={styles.error}>{reparseError}</Text> : null}
@@ -215,55 +221,47 @@ export default function EditRecipeScreen({ route, navigation }: Props) {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <Pressable style={styles.saveButton} onPress={handleSave} disabled={isSaving}>
-        {isSaving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveButtonText}>Save Changes</Text>}
-      </Pressable>
+      <Button title="Save Changes" onPress={handleSave} loading={isSaving} style={{ marginTop: spacing.xl, marginBottom: spacing.sm }} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', padding: 24 },
-  image: { width: '100%', height: 200, borderRadius: 10, backgroundColor: '#eee', marginBottom: 16 },
-  label: { fontSize: 13, fontWeight: '600', color: '#555', marginBottom: 4, marginTop: 12 },
+  container: { flex: 1, backgroundColor: colors.background },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background, padding: spacing.xl },
+  image: { width: '100%', height: 200, borderRadius: radius.lg, backgroundColor: colors.surfaceTint, marginBottom: spacing.lg },
+  label: { fontSize: 13, fontWeight: '600', color: colors.inkSoft, marginBottom: spacing.xs, marginTop: spacing.md },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
+    padding: spacing.md,
     fontSize: 16,
+    backgroundColor: colors.surface,
+    color: colors.ink,
   },
   multiline: { minHeight: 120 },
   reparseButton: {
-    marginTop: 8,
+    marginTop: spacing.sm,
     padding: 10,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     borderWidth: 1,
-    borderColor: '#2f9e44',
+    borderColor: colors.primary,
     alignItems: 'center',
   },
-  reparseButtonText: { color: '#2f9e44', fontWeight: '600', fontSize: 13 },
-  hint: { fontSize: 12, color: '#999', marginBottom: 8, lineHeight: 17 },
-  nutritionRow: { flexDirection: 'row', gap: 8 },
+  reparseButtonRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  reparseButtonText: { color: colors.primaryDark, fontWeight: '600', fontSize: 13 },
+  hint: { fontSize: 12, color: colors.inkMuted, marginBottom: spacing.sm, lineHeight: 17 },
+  nutritionRow: { flexDirection: 'row', gap: spacing.sm },
   nutritionField: { flex: 1 },
-  subLabel: { fontSize: 12, color: '#777', marginBottom: 4 },
+  subLabel: { fontSize: 12, color: colors.inkSoft, marginBottom: spacing.xs },
   caption: {
     fontSize: 13,
-    color: '#888',
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    padding: 12,
+    color: colors.inkMuted,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radius.sm,
+    padding: spacing.md,
     lineHeight: 19,
   },
-  error: { color: '#e03131', marginTop: 16 },
-  saveButton: {
-    backgroundColor: '#2f9e44',
-    borderRadius: 8,
-    padding: 14,
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 8,
-  },
-  saveButtonText: { color: '#fff', fontWeight: '600', fontSize: 15 },
+  error: { color: colors.error, marginTop: spacing.lg },
 });

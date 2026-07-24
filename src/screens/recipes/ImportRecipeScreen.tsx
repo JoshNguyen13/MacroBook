@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { importRecipeFromUrl, parseCaption, type ImportedRecipe } from '../../lib/recipeImport';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/AuthContext';
+import { colors, radius, spacing } from '../../theme';
+import Button from '../../components/Button';
 import type { RecipesStackParamList } from '../../navigation/RecipesStack';
 
 type Props = NativeStackScreenProps<RecipesStackParamList, 'ImportRecipe'>;
@@ -112,9 +114,7 @@ export default function ImportRecipeScreen({ navigation }: Props) {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <Pressable style={styles.button} onPress={handleImport} disabled={isImporting || !url.trim()}>
-        {isImporting ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Import</Text>}
-      </Pressable>
+      <Button title="Import" onPress={handleImport} loading={isImporting} disabled={!url.trim()} />
 
       {!fetchFailed ? (
         <Text style={styles.note}>
@@ -137,13 +137,7 @@ export default function ImportRecipeScreen({ navigation }: Props) {
             textAlignVertical="top"
           />
           {manualError ? <Text style={styles.error}>{manualError}</Text> : null}
-          <Pressable
-            style={styles.button}
-            onPress={handleManualParse}
-            disabled={isParsing || !manualCaption.trim()}
-          >
-            {isParsing ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Parse Caption</Text>}
-          </Pressable>
+          <Button title="Parse Caption" onPress={handleManualParse} loading={isParsing} disabled={!manualCaption.trim()} />
         </View>
       )}
     </View>
@@ -151,33 +145,28 @@ export default function ImportRecipeScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 16 },
-  title: { fontSize: 20, fontWeight: '700', marginTop: 8 },
-  subtitle: { fontSize: 14, color: '#666', marginTop: 4, marginBottom: 20 },
+  container: { flex: 1, backgroundColor: colors.background, padding: spacing.lg },
+  title: { fontSize: 20, fontWeight: '700', color: colors.ink, marginTop: spacing.sm },
+  subtitle: { fontSize: 14, color: colors.inkSoft, marginTop: spacing.xs, marginBottom: spacing.xl },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
+    padding: spacing.md,
     fontSize: 16,
-    marginBottom: 12,
+    backgroundColor: colors.surface,
+    color: colors.ink,
+    marginBottom: spacing.md,
   },
   multiline: { minHeight: 120 },
-  error: { color: '#e03131', marginBottom: 12 },
-  button: {
-    backgroundColor: '#2f9e44',
-    borderRadius: 8,
-    padding: 14,
-    alignItems: 'center',
-  },
-  buttonText: { color: '#fff', fontWeight: '600', fontSize: 15 },
-  note: { fontSize: 13, color: '#999', marginTop: 20, lineHeight: 19 },
+  error: { color: colors.error, marginBottom: spacing.md },
+  note: { fontSize: 13, color: colors.inkMuted, marginTop: spacing.xl, lineHeight: 19 },
   manualSection: {
-    marginTop: 24,
-    paddingTop: 20,
+    marginTop: spacing.xl,
+    paddingTop: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: colors.border,
   },
-  manualTitle: { fontSize: 15, fontWeight: '700', marginBottom: 4 },
-  manualHint: { fontSize: 13, color: '#666', marginBottom: 12, lineHeight: 18 },
+  manualTitle: { fontSize: 15, fontWeight: '700', color: colors.ink, marginBottom: spacing.xs },
+  manualHint: { fontSize: 13, color: colors.inkSoft, marginBottom: spacing.md, lineHeight: 18 },
 });

@@ -35,7 +35,13 @@
       "Bash(curl -s \"https://world.openfoodfacts.org/api/v2/product/3017620422003.json\")",
       "Bash(curl -s \"https://world.openfoodfacts.org/api/v2/product/3017620422003.json?fields=product_name,nutriments,serving_size,serving_quantity,image_front_url,nutrition_data_per\")",
       "WebFetch(domain:expo.dev)",
-      "Bash(timeout 20 npx vercel dist --prod --yes)"
+      "Bash(timeout 20 npx vercel dist --prod --yes)",
+      "Bash(xargs grep -l \"interface Theme\\\\|type Theme\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8081 --max-time 5)",
+      "Bash(powershell -Command \"Get-Process -Id 5560 -ErrorAction SilentlyContinue | Stop-Process -Force\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8081 --max-time 3)",
+      "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 8081 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique\")",
+      "Bash(powershell -Command \"Stop-Process -Id 26848 -Force\")"
     ]
   }
 }

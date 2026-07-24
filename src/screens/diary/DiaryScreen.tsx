@@ -1,9 +1,13 @@
 import { useCallback, useState } from 'react';
-import { View, Text, SectionList, Pressable, StyleSheet } from 'react-native';
+import { View, Text, SectionList, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/AuthContext';
+import { colors, radius, spacing, typography } from '../../theme';
+import Button from '../../components/Button';
+import MacroBar from '../../components/MacroBar';
+import FoodLogCard from '../../components/FoodLogCard';
 import type { DiaryStackParamList } from '../../navigation/DiaryStack';
 import type { FoodLog, MealType } from '../../types/database';
 
@@ -28,25 +32,6 @@ function endOfTodayIso() {
   const d = new Date();
   d.setHours(23, 59, 59, 999);
   return d.toISOString();
-}
-
-function MacroBar({ label, value, goal }: { label: string; value: number; goal: number | null }) {
-  const pct = goal ? Math.min(value / goal, 1) : 0;
-  return (
-    <View style={styles.macroBarRow}>
-      <View style={styles.macroBarLabelRow}>
-        <Text style={styles.macroBarLabel}>{label}</Text>
-        <Text style={styles.macroBarValue}>
-          {Math.round(value)}g{goal ? ` / ${goal}g` : ''}
-        </Text>
-      </View>
-      {goal ? (
-        <View style={styles.macroBarTrack}>
-          <View style={[styles.macroBarFill, { width: `${pct * 100}%` }]} />
-        </View>
-      ) : null}
-    </View>
-  );
 }
 
 export default function DiaryScreen({ navigation }: Props) {
@@ -104,7 +89,7 @@ export default function DiaryScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.summaryCard}>
-        <Text style={styles.totalCalories}>{totalCalories} cal logged</Text>
+        <Text style={typography.title}>{totalCalories} cal logged</Text>
         <Text style={styles.goalText}>
           {goals.calories != null
             ? remaining! >= 0
@@ -123,12 +108,13 @@ export default function DiaryScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.actionRow}>
-        <Pressable style={styles.addButton} onPress={() => navigation.navigate('AddFood')}>
-          <Text style={styles.addButtonText}>+ Log Food</Text>
-        </Pressable>
-        <Pressable style={styles.weeklyButton} onPress={() => navigation.navigate('WeeklySummary')}>
-          <Text style={styles.weeklyButtonText}>Weekly Summary</Text>
-        </Pressable>
+        <Button title="+ Log Food" onPress={() => navigation.navigate('AddFood')} style={styles.actionButton} />
+        <Button
+          title="Weekly Summary"
+          variant="outline"
+          onPress={() => navigation.navigate('WeeklySummary')}
+          style={styles.actionButton}
+        />
       </View>
 
       {sections.length === 0 ? (
@@ -141,10 +127,7 @@ export default function DiaryScreen({ navigation }: Props) {
             <Text style={styles.sectionHeader}>{section.title}</Text>
           )}
           renderItem={({ item }) => (
-            <Pressable style={styles.logRow} onPress={() => navigation.navigate('EditFood', { log: item })}>
-              <Text style={styles.logName}>{item.food_name}</Text>
-              <Text style={styles.logCalories}>{item.calories} cal</Text>
-            </Pressable>
+            <FoodLogCard log={item} onPress={() => navigation.navigate('EditFood', { log: item })} />
           )}
         />
       )}
@@ -153,65 +136,24 @@ export default function DiaryScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 16 },
+  container: { flex: 1, backgroundColor: colors.background, padding: spacing.lg },
   summaryCard: {
-    backgroundColor: '#f4f9f4',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: colors.surfaceTint,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
   },
-  totalCalories: { fontSize: 24, fontWeight: '700' },
-  goalText: { fontSize: 14, color: '#666', marginTop: 4 },
-  macrosSection: { marginTop: 16, gap: 10 },
-  macroBarRow: {},
-  macroBarLabelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-  macroBarLabel: { fontSize: 13, fontWeight: '600', color: '#555' },
-  macroBarValue: { fontSize: 13, color: '#666' },
-  macroBarTrack: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#e2ede2',
-    overflow: 'hidden',
-  },
-  macroBarFill: {
-    height: '100%',
-    backgroundColor: '#2f9e44',
-    borderRadius: 3,
-  },
-  actionRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
-  addButton: {
-    flex: 1,
-    backgroundColor: '#2f9e44',
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-  },
-  addButtonText: { color: '#fff', fontWeight: '600', fontSize: 15 },
-  weeklyButton: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#2f9e44',
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-  },
-  weeklyButtonText: { color: '#2f9e44', fontWeight: '600', fontSize: 15 },
-  empty: { textAlign: 'center', color: '#999', marginTop: 32 },
+  goalText: { fontSize: 14, color: colors.inkSoft, marginTop: spacing.xs },
+  macrosSection: { marginTop: spacing.lg, gap: 10 },
+  actionRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.lg },
+  actionButton: { flex: 1 },
+  empty: { textAlign: 'center', color: colors.inkMuted, marginTop: 32 },
   sectionHeader: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#888',
+    color: colors.inkMuted,
     textTransform: 'uppercase',
-    marginTop: 12,
-    marginBottom: 4,
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
   },
-  logRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  logName: { fontSize: 15 },
-  logCalories: { fontSize: 15, color: '#666' },
 });

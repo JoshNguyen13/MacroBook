@@ -3,6 +3,7 @@ import { Platform, View, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './src/lib/AuthContext';
 import RootNavigator from './src/navigation/RootNavigator';
+import { colors } from './src/theme';
 
 export default function App() {
   return (
@@ -13,7 +14,7 @@ export default function App() {
             <RootNavigator />
           </View>
         </View>
-        <StatusBar style="auto" />
+        <StatusBar style="dark" />
       </AuthProvider>
     </SafeAreaProvider>
   );
@@ -23,7 +24,7 @@ const styles = StyleSheet.create({
   outer: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: Platform.OS === 'web' ? '#e9ecef' : 'transparent',
+    backgroundColor: Platform.OS === 'web' ? colors.border : 'transparent',
   },
   inner: Platform.OS === 'web' ? { flex: 1, width: '100%', maxWidth: 480 } : { flex: 1, width: '100%' },
 });

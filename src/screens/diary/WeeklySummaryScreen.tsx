@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/AuthContext';
+import { colors, radius, spacing } from '../../theme';
 import type { DiaryStackParamList } from '../../navigation/DiaryStack';
 import type { FoodLog } from '../../types/database';
 
@@ -159,23 +160,23 @@ export default function WeeklySummaryScreen(_props: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: colors.background },
   headlineCard: {
-    backgroundColor: '#f4f9f4',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: colors.surfaceTint,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
     alignItems: 'center',
   },
-  headlineValue: { fontSize: 32, fontWeight: '700', color: '#1a1a1a' },
-  headlineLabel: { fontSize: 13, color: '#666', marginTop: 2 },
+  headlineValue: { fontSize: 32, fontWeight: '700', color: colors.ink },
+  headlineLabel: { fontSize: 13, color: colors.inkSoft, marginTop: 2 },
   chartCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: '#f0f0f0',
-    padding: 16,
-    marginBottom: 12,
+    borderColor: colors.border,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
   },
   barArea: { height: BAR_AREA_HEIGHT, position: 'relative' },
   goalLine: {
@@ -184,34 +185,34 @@ const styles = StyleSheet.create({
     right: 0,
     height: 1,
     borderTopWidth: 1,
-    borderTopColor: '#adb5bd',
+    borderTopColor: colors.inkMuted,
     borderStyle: 'dashed',
   },
   barsRow: { flexDirection: 'row', height: '100%', alignItems: 'flex-end' },
   barColumn: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', height: '100%' },
-  barValue: { fontSize: 10, color: '#888', marginBottom: 2, height: 14 },
+  barValue: { fontSize: 10, color: colors.inkMuted, marginBottom: 2, height: 14 },
   barTrack: { justifyContent: 'flex-end', alignItems: 'center', flex: 1 },
   bar: {
     width: 18,
-    backgroundColor: '#a8d8b0',
+    backgroundColor: colors.primaryLight,
     borderTopLeftRadius: 4,
     borderTopRightRadius: 4,
   },
-  barToday: { backgroundColor: '#2f9e44' },
+  barToday: { backgroundColor: colors.primary },
   dayLabelsRow: { flexDirection: 'row', marginTop: 6 },
-  dayLabel: { flex: 1, fontSize: 11, color: '#999', textAlign: 'center' },
-  dayLabelToday: { color: '#2f9e44', fontWeight: '700' },
-  goalCaption: { fontSize: 11, color: '#adb5bd', marginTop: 8, textAlign: 'right' },
+  dayLabel: { flex: 1, fontSize: 11, color: colors.inkMuted, textAlign: 'center' },
+  dayLabelToday: { color: colors.primaryDark, fontWeight: '700' },
+  goalCaption: { fontSize: 11, color: colors.inkMuted, marginTop: spacing.sm, textAlign: 'right' },
   macroSummaryCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: '#f0f0f0',
-    padding: 16,
+    borderColor: colors.border,
+    padding: spacing.lg,
   },
-  macroSummaryTitle: { fontSize: 13, fontWeight: '700', color: '#555', marginBottom: 12 },
+  macroSummaryTitle: { fontSize: 13, fontWeight: '700', color: colors.inkSoft, marginBottom: spacing.md },
   macroSummaryRow: { flexDirection: 'row', justifyContent: 'space-around' },
   macroSummaryItem: { alignItems: 'center' },
-  macroSummaryValue: { fontSize: 20, fontWeight: '700', color: '#1a1a1a' },
-  macroSummaryLabel: { fontSize: 12, color: '#888', marginTop: 2 },
+  macroSummaryValue: { fontSize: 20, fontWeight: '700', color: colors.ink },
+  macroSummaryLabel: { fontSize: 12, color: colors.inkMuted, marginTop: 2 },
 });
